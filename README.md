@@ -25,7 +25,7 @@ We have chosen Core PHP for the following reasons:
 
 ### 1. composer.json
 Your `composer.json` file contains the dependencies for the project, which are installed via Composer.
-
+```json
 {
     "require": {
         "phpoffice/phpspreadsheet": "^3.7",
@@ -34,10 +34,12 @@ Your `composer.json` file contains the dependencies for the project, which are i
         "symfony/css-selector": "^7.2"
     }
 }
+```
 This file lists the necessary libraries for handling Excel files, HTTP requests, and web scraping.
 
 ###  2. File Upload Form (index.php)
 This is the simple HTML form used to upload the Excel file containing ASINs.
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,13 +55,14 @@ This is the simple HTML form used to upload the Excel file containing ASINs.
     </form>
 </body>
 </html>
-
+```
 - **sAction URL**: The form submits the file to upload.php, where the file will be processed.
 - **sFile Input**: The file input allows users to upload .xlsx or .xls files.
 - **sSubmit Button**: Triggers the file upload.
 
 ### 3. File Processing (upload.php)
 This PHP script handles file upload, processes the Excel file, fetches ASIN data, and generates a new Excel file.
+```php
 <?php
 require_once 'vendor/autoload.php';
 
@@ -123,7 +126,7 @@ function getProductData($asin) {
     }
 }
 ?>
-
+```
 - **Explanation**:
 - **Directory Setup**: The code checks and creates the uploads and processed_files directories if they don't exist.
 if (!is_dir('uploads')) mkdir('uploads', 0775, true);
@@ -131,13 +134,15 @@ if (!is_dir('processed_files')) mkdir('processed_files', 0775, true);
 - **File Upload Handling**: The uploaded file is saved in the uploads directory.
 move_uploaded_file($uploadedFile, 'uploads/' . $fileName);
 Loading the Excel File: The file is loaded using PHPSpreadsheet to manipulate the data.
-
+```php
 $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('uploads/' . $fileName);
+```
 - **Processing Each Row**: We loop through each row in the spreadsheet, fetching the ASIN from the second column (index 2) and calling the getProductData() function to retrieve data for the ASIN.
-
+```php
 $cellValue = $sheet->getCellByColumnAndRow(2, $rowIndex)->getValue();
+```
 - **Product Data Retrieval**: The getProductData() function sends a request to an external API using Guzzle and retrieves product details. If no data is found, default values are returned.
-
+```php
 $client = new \GuzzleHttp\Client();
 $response = $client->get("https://api.example.com/asin/$asin");
 Updating Excel Sheet: The product data (name, price, description) is written into the Excel sheet in columns 3, 4, and 5.
@@ -151,6 +156,7 @@ $newFileName = 'processed_files/' . uniqid() . '.xlsx';
 Providing Download Link: A link to the processed file is provided for the user to download.
 
 echo "File processed successfully. <a href='$newFileName'>Download Here</a>";
+```
 Guidelines for Running the Code
 ### Prerequisites
 PHP 7.4 or higher.
@@ -158,7 +164,7 @@ Composer installed to manage dependencies.
 Setup
 Clone the repository:
 
-
+```bash
 git clone https://github.com/talha1135/aws-scrapper-php
 cd your-repository-name
 Install dependencies:
@@ -175,7 +181,9 @@ Set correct permissions:
 
 chmod -R 775 uploads/
 chmod -R 775 processed_files/
+```
 
--**serve code** run php -S localhost:8000 
+-**serve code** run
+```bash php -S localhost:8000 ```
 ### Conclusion
 This project provides a fully automated solution to process ASINs from Excel files, retrieve product data from external APIs, and generate updated reports in Excel format. It leverages PHP’s flexibility, powerful packages, and external APIs to streamline the workflow.
